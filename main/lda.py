@@ -1,6 +1,7 @@
 from pymongo import MongoClient
 from nltk.corpus import stopwords
 from nltk.stem.wordnet import WordNetLemmatizer
+from nltk.util import ngrams
 import string
 import gensim
 from gensim import corpora
@@ -11,22 +12,19 @@ exclude = set(string.punctuation)
 lemma = WordNetLemmatizer()
 
 #Database Setup
-MONGO_HOST= 'mongodb://localhost/IBDtweetsDB'
+MONGO_HOST= 'mongodb://junekang08:Rf860704!@cluster0-shard-00-00-cnddh.mongodb.net:27017,cluster0-shard-00-01-cnddh.mongodb.net:27017,cluster0-shard-00-02-cnddh.mongodb.net:27017/test?ssl=true&replicaSet=Cluster0-shard-0&authSource=admin'
 client   = MongoClient(MONGO_HOST)
-db       = client.IBDtweetsDB
-count    = 0
+db       = client.IBDTweets
 
 #Cleaning and Preprocessing
 def clean(doc):
     def replace_all(text, dic):
-        global count
         for i, j in dic.iteritems():
-            count = count + 1
             text = text.replace(i, j)
         return text
     # Replace synonyms into the same word
     replaceDic = {'Crohn': "ibd",'crohn\'s': "ibd",'ibd\'s':"ibd", 'ibds':"ibd", 'crohns': "ibd", 'cron\'s': "ibd", 'crons': "ibd", 'ulcerative': "ibd",'colitis': "ibd",
-         'ibd': "ibd", 'inflammatory bowel': "ibd",'inflamatory bowel': "ibd", 'bowel disease': "ibd"}
+         'ibd': "ibd", 'inflammatory bowel': "ibd",'inflamatory bowel': "ibd", 'bowel disease': "ibd", "&amp": ""}
     doc = replace_all(doc, replaceDic)
 
     doc = doc.replace('RT ', ' ')
@@ -43,8 +41,9 @@ for data in db.tweet.find({}, {"text":1, "_id":0}):
 # print(tweetsList[0])
 
 cleanedTweetsList = [clean(tweet).split() for tweet in tweetsList]
-print(count)
-
+print 'size: ', len(cleanedTweetsList)
+# for tweet in range(len(cleanedTweetsList)):
+#     cleanedTweetsList[tweet] = cleanedTweetsList[tweet] + ["_".join(w) for w in ngrams(cleanedTweetsList[tweet], 2)]
 # print(cleanedTweetsList[0])
 
 # Creating the term dictionary of our courpus, where every unique term is assigned an index. 
