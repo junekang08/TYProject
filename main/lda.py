@@ -30,8 +30,8 @@ doc_term_matrix = [dictionary.doc2bow(doc) for doc in cleanedTweetsList]
 Lda = gensim.models.ldamodel.LdaModel
 
 # Running and Trainign LDA model on the document term matrix.
-ldamodel = Lda(doc_term_matrix, num_topics=20, id2word = dictionary, passes=100)
+ldamodel = Lda(doc_term_matrix, num_topics=30, id2word = dictionary, passes=100)
 
 # Print results
-for topic in ldamodel.print_topics(num_topics=20, num_words=8):
+for topic in ldamodel.print_topics(num_topics=30, num_words=6):
     print (topic, "\n")
